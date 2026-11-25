@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpportunityHub | High School Opportunities, Volunteering & Portfolio Ecosystem</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React 18 & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel for JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* Custom Accessibility & Animation styles */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background-color: #f8fafc;
+      -webkit-font-smoothing: antialiased;
+    }
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid #4f46e5;
+      outline-offset: 2px;
+    }
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #4f46e5;
+      color: white;
+      padding: 8px 16px;
+      z-index: 100;
+      transition: top 0.2s;
+      font-weight: 600;
+      border-radius: 0 0 6px 0;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-resume, #printable-resume * {
+        visibility: visible;
+      }
+      #printable-resume {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- APPLICATION SCRIPT WITH BABEL JSX -->
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // --- SEED DATABASE OF OPPORTUNITIES ---
+    const INITIAL_OPPORTUNITIES = [
+      {
+        id: 'vol-1',
+        title: 'Rotary Youth Literacy & Digital Mentorship Initiative',
+        organization: {
+          name: 'Rotary International & Interact Club',
+          verified: true,
+          type: 'Non-Profit Youth Division'
+        },
+        category: 'Volunteering',
+        description: 'Mentor middle and high school students in underprivileged community schools on basic computer literacy and reading comprehension.',
+        longDescription: 'Collaborate with the local Rotary & Interact Club chapter to lead weekly 1-on-1 reading and digital skills sessions. Interactors and student volunteers design engaging micro-lessons, track student progress, and receive verified Rotary community service credit hours for their college portfolios.',
+        eligibility: {
+          ageRange: '14 - 18 years',
+          grades: 'Grades 9 - 12',
+          locationRequirement: 'Hybrid (Bangalore & Remote Sessions)',
+          prerequisites: [
+            'Fluency in English (regional language is a plus)',
+            'Passionate about community teaching and youth outreach',
+            'Commitment to attend Saturday 2-hour mentoring sessions'
+          ]
+        },
+        deadline: '2026-12-15',
+        deadlineFormatted: 'Dec 15, 2026',
+        deadlineType: 'Fixed',
+        duration: '10 Weeks',
+        commitment: '3-4 hrs / week',
+        location: 'Hybrid (Bangalore & Online)',
+        locationType: 'Hybrid',
+        cost: '100% Free',
+        perks: [
+          'Official Rotary International Volunteer Certificate',
+          '35 Verified Community Service Hours',
+          'Presidential / Interact Club Leadership Citation'
+        ],
+        tags: ['Community Service', 'Rotary / Interact', 'Education & Tutoring', 'Youth Leadership'],
+        applicationUrl: 'https://rotary.org/en/get-involved/interact-clubs',
+        contactEmail: 'outreach@rotaryyouth.org',
+        learningOutcomes: [
+          'Public speaking and youth pedagogy experience',
+          'Community impact assessment and project reporting',
+          'Rotary youth leadership credentials'
+        ]
+      },
+      {
+        id: 'vol-2',
+        title: 'EcoWarriors Urban Afforestation & Wetland Conservation',
+        organization: {
+          name: 'Youth Climate Alliance',
+          verified: true,
+          type: 'Environmental NGO'
+        },
+        category: 'Volunteering',
+        description: 'Participate in lake rejuvenation drives, biodiversity mapping, and urban sapling monitoring alongside environmental researchers.',
+        longDescription: 'High school volunteers work with biodiversity experts to document flora/fauna species in revived urban lakes, construct natural composting pits, and organize community tree stewardship days. Ideal for students interested in environmental sciences and ecology.',
+        eligibility: {
+          ageRange: '13 - 18 years',
+          grades: 'Grades 8 - 12',
+          locationRequirement: 'In-Person (Weekend drives at city lakes)',
+          prerequisites: [
+            'Enthusiasm for outdoor fieldwork and sustainability',
+            'Parental consent form signed upon registration'
+          ]
+        },
+        deadline: '2026-12-30',
+        deadlineFormatted: 'Dec 30, 2026',
+        deadlineType: 'Rolling',
+        duration: '6 Weeks (Weekends)',
+        commitment: '2-3 hrs / weekend',
+        location: 'In-Person (City Lakes & Parks)',
+        locationType: 'In-Person',
+        cost: 'Free (Field kit provided)',
+        perks: [
+          'Verified Environmental Volunteer Certificate',
+          '20 Verified Field Service Hours',
+          'Co-authorship in Citizen Science Biodiversity Report'
+        ],
+        tags: ['Environmental Action', 'Community Service', 'Sustainability', 'Fieldwork'],
+        applicationUrl: 'https://youthclimatealliance.org/volunteer',
+        contactEmail: 'lakes@youthclimatealliance.org',
+        learningOutcomes: [
+          'Field ecology sampling techniques',
+          'Community mobilization and environmental advocacy',
+          'Urban wetland preservation insights'
+        ]
+      },
+      {
+        id: 'vol-3',
+        title: 'Global Voices: English & STEM Tutoring for Under-Resourced Teens',
+        organization: {
+          name: 'Global Peer Bridges',
+          verified: true,
+          type: 'Global Education Initiative'
+        },
+        category: 'Volunteering',
+        description: 'Deliver weekly Zoom tutoring sessions in math, science, or conversational English to students across rural community centers.',
+        longDescription: 'Join an international network of over 1,200 high school tutors. You will be matched 1:1 with an eager middle schooler to provide academic support, homework help, and confidence-building conversation once a week from the comfort of your desk.',
+        eligibility: {
+          ageRange: '15 - 19 years',
+          grades: 'Grades 10 - 12',
+          locationRequirement: '100% Remote (Global)',
+          prerequisites: [
+            'Strong academic record in Math, Science, or English',
+            'Stable internet connection and working webcam',
+            'Brief 15-minute mock teaching interview'
+          ]
+        },
+        deadline: '2027-01-10',
+        deadlineFormatted: 'Jan 10, 2027',
+        deadlineType: 'Rolling',
+        duration: '3 Months',
+        commitment: '2 hrs / week',
+        location: 'Remote (Worldwide)',
+        locationType: 'Remote',
+        cost: '100% Free',
+        perks: [
+          'International Peer Tutoring Credential',
+          '30 Verified Service Hours',
+          'Personal Letter of Recommendation upon 90% attendance'
+        ],
+        tags: ['Education & Tutoring', 'Computer Science & AI', 'Global Outreach', 'Youth Leadership'],
+        applicationUrl: 'https://globalpeerbridges.org/apply-tutor',
+        contactEmail: 'tutors@globalpeerbridges.org',
+        learningOutcomes: [
+          'Cross-cultural communication and empathy',
+          'Curriculum tailoring and student assessment',
+          'Remote pedagogical leadership'
+        ]
+      },
+      {
+        id: 'int-1',
+        title: 'High School Tech & Web Prototyping Fellow',
+        organization: {
+          name: 'OpenEd Labs & FutureCoders',
+          verified: true,
+          type: 'EdTech Research Lab'
+        },
+        category: 'Internships',
+        description: 'Work directly with senior developers to build open-source educational mini-apps using React, JavaScript, and accessible web standards.',
+        longDescription: 'A structured 8-week summer & winter fellowship for teen coders. You will be paired with a staff software engineer mentor to contribute code to open educational tools. Gain real git, code review, component design, and responsive styling experience.',
+        eligibility: {
+          ageRange: '15 - 18 years',
+          grades: 'Grades 10 - 12',
+          locationRequirement: 'Remote with optional weekend lab visits',
+          prerequisites: [
+            'Working knowledge of HTML, CSS, and basic JavaScript',
+            'Familiarity with React or interest in learning modern front-end',
+            'Submission of 1 mini project or code sample on GitHub/Replit'
+          ]
+        },
+        deadline: '2026-12-20',
+        deadlineFormatted: 'Dec 20, 2026',
+        deadlineType: 'Fixed',
+        duration: '8 Weeks',
+        commitment: '5-8 hrs / week',
+        location: 'Remote (Flexible)',
+        locationType: 'Remote',
+        cost: 'Free (Provides $300 Project Grant / Stipend)',
+        perks: [
+          'Industry Engineering Mentorship (1-on-1)',
+          'Verified Engineering Internship Certificate',
+          'Published Open Source Contributor Credits on GitHub',
+          'Stipend / Learning Stipend ($300)'
+        ],
+        tags: ['Computer Science & AI', 'Web Development', 'Design & UI/UX', 'STEM'],
+        applicationUrl: 'https://openedlabs.org/fellowship',
+        contactEmail: 'fellows@openedlabs.org',
+        learningOutcomes: [
+          'Production React and state management patterns',
+          'Web accessibility (WCAG) and responsive design best practices',
+          'Software team workflows: PRs, code reviews, and CI/CD'
+        ]
+      },
+      {
+        id: 'int-2',
+        title: 'Junior Civic Research & Policy Analysis Intern',
+        organization: {
+          name: 'Youth Policy Institute',
+          verified: true,
+          type: 'Civic Think Tank'
+        },
+        category: 'Internships',
+        description: 'Conduct policy research, draft policy briefs on adolescent public health and education equity, and present to municipal council members.',
+        longDescription: 'High school interns assist policy analysts in gathering survey data, analyzing municipal expenditure on public schools, and summarizing legislative drafts into accessible infographics for student advocates.',
+        eligibility: {
+          ageRange: '16 - 18 years',
+          grades: 'Grades 11 - 12',
+          locationRequirement: 'Remote / Virtual',
+          prerequisites: [
+            'Strong writing and critical analysis abilities',
+            'Interest in public administration, law, or economics',
+            '500-word statement on a civic issue affecting youth'
+          ]
+        },
+        deadline: '2027-01-05',
+        deadlineFormatted: 'Jan 5, 2027',
+        deadlineType: 'Fixed',
+        duration: '6 Weeks',
+        commitment: '4-6 hrs / week',
+        location: 'Remote',
+        locationType: 'Remote',
+        cost: 'Free',
+        perks: [
+          'Co-authored Policy Brief published on Think Tank Journal',
+          'Letter of Recommendation from Policy Director',
+          'Verified Research Internship Certificate'
+        ],
+        tags: ['Youth Leadership & MUN', 'Debate & Public Speaking', 'Civic Engagement'],
+        applicationUrl: 'https://youthpolicyinstitute.org/interns',
+        contactEmail: 'policy@youthpolicyinstitute.org',
+        learningOutcomes: [
+          'Qualitative and quantitative civic policy analysis',
+          'Executive summary and whitepaper drafting',
+          'Public advocacy and stakeholder presentation'
+        ]
+      },
+      {
+        id: 'comp-1',
+        title: 'National High School Social Innovation Hackathon 2026',
+        organization: {
+          name: 'Vanguard Youth Innovators',
+          verified: true,
+          type: 'Global Youth Foundation'
+        },
+        category: 'Competitions',
+        description: 'Build a tech or community-based solution tackling UN Sustainable Development Goals (SDGs). Pitch to industry judges and venture mentors.',
+        longDescription: 'Teams of 1-4 high school students have 48 hours (virtual weekend) to prototype a mobile app, website, or community campaign. Free mentor office hours, workshops on pitch decks, and $10,000 in seed grants for top projects.',
+        eligibility: {
+          ageRange: '13 - 18 years',
+          grades: 'Grades 8 - 12',
+          locationRequirement: '100% Virtual Hackathon',
+          prerequisites: [
+            'Solo participants or teams of up to 4 high school students',
+            'No prior coding required; non-tech business tracks available'
+          ]
+        },
+        deadline: '2026-12-08',
+        deadlineFormatted: 'Dec 8, 2026',
+        deadlineType: 'Upcoming',
+        duration: '3-Day Virtual Sprint',
+        commitment: 'Weekend Intensive',
+        location: 'Online (Discord & Devpost)',
+        locationType: 'Remote',
+        cost: '100% Free Entry',
+        perks: [
+          '$10,000 in Seed Grant Prizes & College Scholarships',
+          'Direct Mentorship from Tech Founders & Angel Investors',
+          'Digital Certificate of Participation for all submissions'
+        ],
+        tags: ['Computer Science & AI', 'Entrepreneurship', 'Youth Leadership', 'Sustainability'],
+        applicationUrl: 'https://youthsocialhackathon.org/register',
+        contactEmail: 'organizers@youthsocialhackathon.org',
+        learningOutcomes: [
+          'Rapid product prototyping and wireframing',
+          'Pitch deck construction and elevator pitches',
+          'Collaborative team leadership under time constraints'
+        ]
+      },
+      {
+        id: 'comp-2',
+        title: 'Global Youth Model United Nations (MUN) Leadership Summit',
+        organization: {
+          name: 'International Diplomacy Council',
+          verified: true,
+          type: 'Inter-School MUN Secretariat'
+        },
+        category: 'Competitions',
+        description: 'Debate international security, humanitarian crises, and climate accords. Represent nations across specialized UN committees.',
+        longDescription: 'A prestigious inter-school conference featuring General Assembly, Security Council, and Historic Crisis Committees. Students formulate draft resolutions, master parliamentary debate, and negotiate multilateral treaties.',
+        eligibility: {
+          ageRange: '14 - 18 years',
+          grades: 'Grades 9 - 12',
+          locationRequirement: 'Hybrid (Bangalore Convention Center & Online Committees)',
+          prerequisites: [
+            'Enrolled high school student',
+            'Submission of delegate country preference and position paper'
+          ]
+        },
+        deadline: '2026-12-18',
+        deadlineFormatted: 'Dec 18, 2026',
+        deadlineType: 'Fixed',
+        duration: '3 Days (Fri-Sun)',
+        commitment: 'Weekend Conference',
+        location: 'Hybrid (Bangalore / Remote Stream)',
+        locationType: 'Hybrid',
+        cost: 'Delegate Fee Waived (Free Tier Available)',
+        perks: [
+          'Best Delegate, High Commendation & Special Mention Awards',
+          'Official Secretariat Certificate of Diplomatic Merit',
+          'Publication in International Youth MUN Journal'
+        ],
+        tags: ['Youth Leadership & MUN', 'Debate & Public Speaking', 'Civic Engagement'],
+        applicationUrl: 'https://globalyouthmun.org/delegates',
+        contactEmail: 'secretariat@globalyouthmun.org',
+        learningOutcomes: [
+          'Parliamentary procedure and formal diplomatic negotiation',
+          'Resolution drafting and crisis response under pressure',
+          'High-impact public speaking and caucus alliance building'
+        ]
+      },
+      {
+        id: 'wrk-1',
+        title: 'College Portfolio & Extracurricular Strategy Masterclass',
+        organization: {
+          name: 'Ivy & Global Horizons Advising',
+          verified: true,
+          type: 'Student Advisory Non-Profit'
+        },
+        category: 'Workshops',
+        description: 'Learn how to transform community service, school clubs, and passions into a cohesive, high-impact high school profile.',
+        longDescription: 'An interactive 2-session weekend masterclass led by college admissions advisors and senior student leaders. Covers crafting a "spike" extracurricular theme, logging verifiable hours, securing meaningful recommendation letters, and avoiding cookie-cutter activities.',
+        eligibility: {
+          ageRange: '14 - 18 years',
+          grades: 'Grades 9 - 12',
+          locationRequirement: 'Live Virtual Workshop (Interactive Q&A)',
+          prerequisites: [
+            'Open to all high school students and parents',
+            'Draft of current extracurricular activities (optional but helpful)'
+          ]
+        },
+        deadline: '2026-11-30',
+        deadlineFormatted: 'Nov 30, 2026',
+        deadlineType: 'Upcoming',
+        duration: '2 Days (2 hrs/day)',
+        commitment: '4 hrs total',
+        location: 'Online Live Stream (Zoom)',
+        locationType: 'Remote',
+        cost: '100% Free (Sponsored by Alumni Trust)',
+        perks: [
+          'Personalized Extracurricular Audit & Feedback Rubric',
+          'Comprehensive 40-Page High School Portfolio Workbook (PDF)',
+          'Certificate of Workshop Completion'
+        ],
+        tags: ['Youth Leadership', 'College Prep', 'Debate & Public Speaking', 'Community Service'],
+        applicationUrl: 'https://globalhorizonsadvising.org/masterclass',
+        contactEmail: 'admissions@globalhorizonsadvising.org',
+        learningOutcomes: [
+          'Identifying your authentic academic & service "spike"',
+          'Structuring activity descriptions with quantifiable impact metrics',
+          'Effective timeline planning for Grades 9 through 12'
+        ]
+      },
+      {
+        id: 'cert-1',
+        title: 'Verified Youth Leadership & Rotary Community Service Hours',
+        organization: {
+          name: 'Rotary District 3190 / Interact Council',
+          verified: true,
+          type: 'Service Organization'
+        },
+        category: 'Certifications',
+        description: 'Earn a standardized, third-party verified service hours transcript signed by District Rotary Chairs for your college application.',
+        longDescription: 'Standardize your volunteer log. Whether you organized fundraisers, blood donation drives, or Interact club initiatives, this credential program verifies your attendance logs, supervisor signatures, and reflection essays into a sealed digital credential.',
+        eligibility: {
+          ageRange: '14 - 18 years',
+          grades: 'Grades 9 - 12',
+          locationRequirement: 'Available to all registered school Interactors & Volunteers',
+          prerequisites: [
+            'Minimum of 20 verified service hours logged with an approved school club or NGO',
+            'Supervisor contact details and signed activity logsheet',
+            '300-word reflective essay on community impact'
+          ]
+        },
+        deadline: '2026-12-31',
+        deadlineFormatted: 'Dec 31, 2026',
+        deadlineType: 'Rolling',
+        duration: 'Ongoing Verification (7-day review)',
+        commitment: 'Self-paced documentation',
+        location: 'Digital Verification Portal',
+        locationType: 'Remote',
+        cost: 'Free for registered students',
+        perks: [
+          'Verifiable Cryptographic Digital Badge (Credly / QR verified)',
+          'Official Rotary District Service Transcript PDF',
+          'Direct inclusion in college application portals (Common App ready)'
+        ],
+        tags: ['Rotary / Interact', 'Community Service', 'Youth Leadership', 'College Prep'],
+        applicationUrl: 'https://interactserviceverification.org/verify',
+        contactEmail: 'credentials@interactserviceverification.org',
+        learningOutcomes: [
+          'Structured extracurricular service documentation',
+          'Reflective writing on ethical leadership',
+          'Verifiable evidence for scholarship and university admissions'
+        ]
+      },
+      {
+        id: 'cert-2',
+        title: 'United Nations Sustainable Development Goals (SDG) Youth Ambassador',
+        organization: {
+          name: 'UN Youth Association & SDG Hub',
+          verified: true,
+          type: 'International NGO Network'
+        },
+        category: 'Certifications',
+        description: 'Complete rigorous training on the 17 UN SDGs, execute one local action project, and receive official SDG Ambassador designation.',
+        longDescription: 'This prestigious program equips students with policy understanding, project management toolkits, and an international community of youth ambassadors. Participants select one SDG (e.g., Clean Water, Quality Education, Climate Action) to address within their neighborhood.',
+        eligibility: {
+          ageRange: '14 - 18 years',
+          grades: 'Grades 9 - 12',
+          locationRequirement: 'Global (Online Modules + Local Action Project)',
+          prerequisites: [
+            'Submission of brief 250-word proposal for a local community initiative',
+            'Commitment to submit a final photo-documented project summary'
+          ]
+        },
+        deadline: '2027-01-15',
+        deadlineFormatted: 'Jan 15, 2027',
+        deadlineType: 'Fixed',
+        duration: '4 Weeks',
+        commitment: '2-3 hrs / week',
+        location: 'Global / Online + Local Project',
+        locationType: 'Hybrid',
+        cost: 'Free',
+        perks: [
+          'UN Youth Association Certified SDG Ambassador Credential',
+          'Global Directory Listing and Profile URL',
+          'Invitation to the Annual Youth SDG Assembly'
+        ],
+        tags: ['Youth Leadership & MUN', 'Environmental Action', 'Community Service', 'Civic Engagement'],
+        applicationUrl: 'https://unyouthsdg.org/ambassadors',
+        contactEmail: 'ambassadors@unyouthsdg.org',
+        learningOutcomes: [
+          'Systemic analysis of global development targets',
+          'Project planning and local execution metrics',
+          'Impact storytelling and digital advocacy'
+        ]
+      }
+    ];
+
+    const INITIAL_STUDENT_PROFILE = {
+      name: 'Sri Kumar',
+      grade: 'Grade 11',
+      age: 16,
+      location: 'Bangalore, India',
+      availability: '4 - 6 hrs/week (Weekends & Evenings)',
+      bio: 'High school junior enthusiastic about Rotary Interact community service, public policy, and technology for social impact. Looking to build a balanced portfolio for university applications.',
+      interests: [
+        'Community Service',
+        'Rotary / Interact',
+        'Youth Leadership & MUN',
+        'Computer Science & AI',
+        'Environmental Action'
+      ],
+      serviceHoursLogged: 42,
+      targetHours: 60,
+      school: 'Redbridge International Academy',
+      email: 'sri.kumar@student.edu'
+    };
+
+    const INITIAL_APPLICATIONS = [
+      {
+        id: 'app-1',
+        opportunityId: 'vol-1',
+        opportunityTitle: 'Rotary Youth Literacy & Digital Mentorship Initiative',
+        organization: 'Rotary International & Interact Club',
+        category: 'Volunteering',
+        status: 'Accepted',
+        appliedDate: '2026-11-05',
+        notes: 'Orientation scheduled for next Saturday at 10 AM. Lesson plan prepared.'
+      },
+      {
+        id: 'app-2',
+        opportunityId: 'comp-2',
+        opportunityTitle: 'Global Youth Model United Nations (MUN) Leadership Summit',
+        organization: 'International Diplomacy Council',
+        category: 'Competitions',
+        status: 'Interviewing',
+        appliedDate: '2026-11-14',
+        notes: 'Position paper submitted for UN Security Council delegate seat.'
+      },
+      {
+        id: 'app-3',
+        opportunityId: 'int-1',
+        opportunityTitle: 'High School Tech & Web Prototyping Fellow',
+        organization: 'OpenEd Labs & FutureCoders',
+        category: 'Internships',
+        status: 'Under Review',
+        appliedDate: '2026-11-18',
+        notes: 'Submitted portfolio code sample; waiting for mentor match.'
+      }
+    ];
+
+    const ALL_INTEREST_TAGS = [
+      'Community Service',
+      'Rotary / Interact',
+      'Youth Leadership & MUN',
+      'Computer Science & AI',
+      'Environmental Action',
+      'Healthcare & Bio',
+      'Education & Tutoring',
+      'Debate & Public Speaking',
+      'STEM',
+      'Design & UI/UX',
+      'Civic Engagement',
+      'College Prep'
+    ];
+
+    // --- MAIN REACT APPLICATION COMPONENT ---
+    function App() {
+      // Routing state: 'home', 'redirect-page', 'dashboard'
+      const [currentPage, setCurrentPage] = useState(() => {
+        const hash = window.location.hash;
+        if (hash === '#dashboard') return 'dashboard';
+        if (hash === '#redirect') return 'redirect-page';
+        return 'home';
+      });
+
+      // LocalStorage backed states
+      const [opportunities, setOpportunities] = useState(() => {
+        const saved = localStorage.getItem('opphub_opps');
+        return saved ? JSON.parse(saved) : INITIAL_OPPORTUNITIES;
+      });
+
+      const [studentProfile, setStudentProfile] = useState(() => {
+        const saved = localStorage.getItem('opphub_profile');
+        return saved ? JSON.parse(saved) : INITIAL_STUDENT_PROFILE;
+      });
+
+      const [savedIds, setSavedIds] = useState(() => {
+        const saved = localStorage.getItem('opphub_saved');
+        return saved ? JSON.parse(saved) : ['vol-1', 'int-1', 'cert-1'];
+      });
+
+      const [applications, setApplications] = useState(() => {
+        const saved = localStorage.getItem('opphub_apps');
+        return saved ? JSON.parse(saved) : INITIAL_APPLICATIONS;
+      });
+
+      const [selectedOpp, setSelectedOpp] = useState(null);
+      const [isAdvertiseOpen, setIsAdvertiseOpen] = useState(false);
+      const [isExportOpen, setIsExportOpen] = useState(false);
+      const [toastMsg, setToastMsg] = useState(null);
+
+      // Save on change
+      useEffect(() => {
+        localStorage.setItem('opphub_opps', JSON.stringify(opportunities));
+      }, [opportunities]);
+      useEffect(() => {
+        localStorage.setItem('opphub_profile', JSON.stringify(studentProfile));
+      }, [studentProfile]);
+      useEffect(() => {
+        localStorage.setItem('opphub_saved', JSON.stringify(savedIds));
+      }, [savedIds]);
+      useEffect(() => {
+        localStorage.setItem('opphub_apps', JSON.stringify(applications));
+      }, [applications]);
+
+      // URL Hash listener
+      useEffect(() => {
+        const onHash = () => {
+          if (window.location.hash === '#dashboard') setCurrentPage('dashboard');
+          else if (window.location.hash === '#redirect') setCurrentPage('redirect-page');
+          else setCurrentPage('home');
+        };
+        window.addEventListener('hashchange', onHash);
+        return () => window.removeEventListener('hashchange', onHash);
+      }, []);
+
+      const navigateTo = (page) => {
+        setCurrentPage(page);
+        if (page === 'dashboard') window.location.hash = '#dashboard';
+        else if (page === 'redirect-page') window.location.hash = '#redirect';
+        else window.location.hash = '#home';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const showToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 3000);
+      };
+
+      const toggleSave = (id) => {
+        if (savedIds.includes(id)) {
+          setSavedIds((prev) => prev.filter((i) => i !== id));
+          showToast('Removed from bookmarked opportunities');
+        } else {
+          setSavedIds((prev) => [...prev, id]);
+          showToast('Added to bookmarked opportunities!');
+        }
+      };
+
+      const handleApplyOrTrack = (opp) => {
+        const exists = applications.find((a) => a.opportunityId === opp.id);
+        if (exists) {
+          showToast('Already tracked in your applications pipeline!');
+          return;
+        }
+        const newApp = {
+          id: `app-${Date.now()}`,
+          opportunityId: opp.id,
+          opportunityTitle: opp.title,
+          organization: opp.organization.name,
+          category: opp.category,
+          status: 'Under Review',
+          appliedDate: new Date().toISOString().split('T')[0],
+          notes: 'Applied via official portal; awaiting response.'
+        };
+        setApplications((prev) => [newApp, ...prev]);
+        showToast(`Added "${opp.title}" to your applications tracker!`);
+      };
+
+      const handleAddOpportunity = (newOpp) => {
+        setOpportunities((prev) => [newOpp, ...prev]);
+        showToast('New opportunity published to database!');
+      };
+
+      // Match scoring logic
+      const calculateScore = (opp) => {
+        let score = 50;
+        const matches = opp.tags.filter((t) =>
+          studentProfile.interests.some(
+            (i) => i.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(i.toLowerCase())
+          )
+        );
+        score += Math.min(30, matches.length * 15);
+        if (opp.eligibility.grades.includes(studentProfile.grade)) score += 10;
+        if (opp.locationType === 'Remote' || opp.location.toLowerCase().includes('bangalore')) score += 10;
+        return Math.min(99, score);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+          <a href="#main-content" className="skip-link">Skip to main content</a>
+
+          {/* Toast Notification */}
+          {toastMsg && (
+            <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
+              <span className="text-emerald-400 font-bold">✓</span>
+              <span>{toastMsg}</span>
+            </div>
+          )}
+
+          {/* NAVBAR */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-16">
+                {/* Brand */}
+                <button
+                  onClick={() => navigateTo('home')}
+                  className="flex items-center gap-2.5 text-left rounded-lg p-1 focus:ring-2 focus:ring-indigo-500"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 font-black text-xl">
+                    ⚡
+                  </div>
+                  <div>
+                    <span className="text-xl font-bold tracking-tight text-slate-900 block leading-tight">
+                      Opportunity<span className="text-indigo-600">Hub</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase">
+                      High School Student Portal
+                    </span>
+                  </div>
+                </button>
+
+                {/* Navigation Links */}
+                <nav className="hidden md:flex items-center gap-1.5" aria-label="Main Navigation">
+                  <button
+                    onClick={() => navigateTo('home')}
+                    className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+                      currentPage === 'home'
+                        ? 'bg-indigo-50 text-indigo-700'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>🏠</span> Explore & Recommendations
+                  </button>
+
+                  <button
+                    onClick={() => navigateTo('redirect-page')}
+                    className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+                      currentPage === 'redirect-page'
+                        ? 'bg-amber-50 text-amber-800'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                    title="Constraint Page 2: Contains redirect to Student Dashboard"
+                  >
+                    <span>⚡</span> Page 2: Gateway Redirect
+                    <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded-full ml-1">
+                      Redirect
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => navigateTo('dashboard')}
+                    className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+                      currentPage === 'dashboard'
+                        ? 'bg-indigo-50 text-indigo-700'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>👤</span> Student Dashboard
+                    {savedIds.length > 0 && (
+                      <span className="ml-1 px-1.5 py-0.5 text-xs font-bold bg-indigo-600 text-white rounded-full">
+                        {savedIds.length}
+                      </span>
+                    )}
+                  </button>
+                </nav>
+
+                {/* Right Controls */}
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => setIsAdvertiseOpen(true)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200"
+                  >
+                    + Advertise Program
+                  </button>
+
+                  <button
+                    onClick={() => navigateTo('dashboard')}
+                    className="flex items-center gap-2 pl-2 pr-3 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition-all"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xs">
+                      {studentProfile.name.charAt(0)}
+                    </div>
+                    <div className="text-left hidden sm:block">
+                      <p className="text-xs font-semibold text-slate-800 leading-none">{studentProfile.name}</p>
+                      <p className="text-[10px] text-slate-500 font-medium">{studentProfile.grade}</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* PAGE ROUTING */}
+          {currentPage === 'home' && (
+            <HomePageView
+              opportunities={opportunities}
+              studentProfile={studentProfile}
+              savedIds={savedIds}
+              onToggleSave={toggleSave}
+              onSelectOpp={(opp) => setSelectedOpp(opp)}
+              onApplyOpp={handleApplyOrTrack}
+              onNavigate={navigateTo}
+              onOpenAdvertise={() => setIsAdvertiseOpen(true)}
+              calculateScore={calculateScore}
+            />
+          )}
+
+          {currentPage === 'redirect-page' && (
+            <RedirectPageView
+              studentProfile={studentProfile}
+              savedCount={savedIds.length}
+              applicationsCount={applications.length}
+              onRedirect={() => navigateTo('dashboard')}
+            />
+          )}
+
+          {currentPage === 'dashboard' && (
+            <DashboardView
+              studentProfile={studentProfile}
+              onUpdateProfile={(p) => {
+                setStudentProfile(p);
+                showToast('Student profile updated!');
+              }}
+              applications={applications}
+              onUpdateAppStatus={(appId, st) => {
+                setApplications((prev) =>
+                  prev.map((a) => (a.id === appId ? { ...a, status: st } : a))
+                );
+                showToast(`Status updated to ${st}`);
+              }}
+              onRemoveApp={(appId) => {
+                setApplications((prev) => prev.filter((a) => a.id !== appId));
+                showToast('Application removed');
+              }}
+              opportunities={opportunities}
+              savedIds={savedIds}
+              onToggleSave={toggleSave}
+              onSelectOpp={(opp) => setSelectedOpp(opp)}
+              onOpenExport={() => setIsExportOpen(true)}
+              onNavigate={navigateTo}
+              calculateScore={calculateScore}
+            />
+          )}
+
+          {/* MODALS */}
+          {selectedOpp && (
+            <OpportunityModalView
+              opportunity={selectedOpp}
+              onClose={() => setSelectedOpp(null)}
+              isSaved={savedIds.includes(selectedOpp.id)}
+              onToggleSave={toggleSave}
+              onApplyOrTrack={handleApplyOrTrack}
+              isAlreadyApplied={applications.some((a) => a.opportunityId === selectedOpp.id)}
+            />
+          )}
+
+          {isAdvertiseOpen && (
+            <AdvertiseModalView
+              onClose={() => setIsAdvertiseOpen(false)}
+              onAddOpportunity={handleAddOpportunity}
+            />
+          )}
+
+          {isExportOpen && (
+            <PortfolioExportModalView
+              onClose={() => setIsExportOpen(false)}
+              studentProfile={studentProfile}
+              applications={applications}
+              opportunities={opportunities}
+            />
+          )}
+
+          {/* FOOTER */}
+          <footer className="mt-auto bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">
+                  ⚡
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm">OpportunityHub for High Schoolers</p>
+                  <p className="text-[11px] text-slate-500">Centralized Extracurricular, Volunteering & Portfolio Ecosystem</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-5 text-slate-400 font-medium">
+                <button onClick={() => navigateTo('home')} className="hover:text-white">Explore Opportunities</button>
+                <button onClick={() => navigateTo('redirect-page')} className="hover:text-white">Page 2: Gateway Redirect</button>
+                <button onClick={() => navigateTo('dashboard')} className="hover:text-white">Student Dashboard</button>
+                <button onClick={() => setIsAdvertiseOpen(true)} className="hover:text-white">Advertise Program</button>
+              </div>
+
+              <p className="text-slate-500 text-[11px]">WCAG 2.1 AA Compliant • Built in React & Express</p>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // --- PAGE 1: HOME PAGE VIEW ---
+    function HomePageView({
+      opportunities,
+      studentProfile,
+      savedIds,
+      onToggleSave,
+      onSelectOpp,
+      onApplyOpp,
+      onNavigate,
+      onOpenAdvertise,
+      calculateScore
+    }) {
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedCat, setSelectedCat] = useState('All');
+      const [selectedLoc, setSelectedLoc] = useState('All');
+      const [selectedGrade, setSelectedGrade] = useState('All');
+      const [showUrgent, setShowUrgent] = useState(false);
+
+      const categories = ['All', 'Volunteering', 'Internships', 'Competitions', 'Workshops', 'Certifications'];
+
+      // Recommendations (top 3)
+      const recommendations = useMemo(() => {
+        return [...opportunities]
+          .map((opp) => ({ ...opp, score: calculateScore(opp) }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+      }, [opportunities, studentProfile]);
+
+      // Filtered database
+      const filtered = useMemo(() => {
+        return opportunities.filter((opp) => {
+          if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            const match =
+              opp.title.toLowerCase().includes(q) ||
+              opp.organization.name.toLowerCase().includes(q) ||
+              opp.description.toLowerCase().includes(q) ||
+              opp.tags.some((t) => t.toLowerCase().includes(q));
+            if (!match) return false;
+          }
+          if (selectedCat !== 'All' && opp.category !== selectedCat) return false;
+          if (selectedLoc !== 'All' && opp.locationType !== selectedLoc) return false;
+          if (selectedGrade !== 'All' && !opp.eligibility.grades.includes(selectedGrade)) return false;
+          if (showUrgent && opp.deadlineType !== 'Upcoming') return false;
+          return true;
+        });
+      }, [opportunities, searchQuery, selectedCat, selectedLoc, selectedGrade, showUrgent]);
+
+      return (
+        <main id="main-content" className="pb-16">
+          {/* HERO */}
+          <section className="bg-gradient-to-b from-indigo-900 via-indigo-950 to-slate-900 text-white pt-12 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto relative z-10">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold mb-4 backdrop-blur-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Welcome back, {studentProfile.name} • {studentProfile.grade} • {studentProfile.location}
+                </div>
+
+                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                  Research & Build Your High School{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300">
+                    Future Portfolio
+                  </span>
+                </h1>
+
+                <p className="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
+                  A centralized hub connecting high schoolers with verified volunteering, competitive internships,
+                  hackathons, leadership workshops, and service certifications.
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => onNavigate('dashboard')}
+                    className="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
+                  >
+                    <span>Go to Student Dashboard & Profile</span>
+                    <span>→</span>
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate('redirect-page')}
+                    className="px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold text-sm border border-amber-400/30 backdrop-blur-sm transition-all flex items-center gap-2"
+                  >
+                    <span>⚡ Page 2: Gateway Redirect</span>
+                  </button>
+
+                  <button
+                    onClick={onOpenAdvertise}
+                    className="px-4 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-semibold text-sm border border-slate-700"
+                  >
+                    📢 Advertise Program
+                  </button>
+                </div>
+
+                {/* Metrics */}
+                <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-800/80">
+                  <div>
+                    <p className="text-2xl font-extrabold text-white">{opportunities.length}+</p>
+                    <p className="text-xs text-slate-400 font-medium">Curated Programs</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-emerald-400">100%</p>
+                    <p className="text-xs text-slate-400 font-medium">Verified Partners</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-sky-400">5 Categories</p>
+                    <p className="text-xs text-slate-400 font-medium">Volunteering to Certs</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-amber-400">{studentProfile.serviceHoursLogged} hrs</p>
+                    <p className="text-xs text-slate-400 font-medium">Your Service Logged</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* RECOMMENDATIONS CAROUSEL */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">⭐</span>
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900">Recommended for You</h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Personalized match based on: <span className="text-indigo-600 font-semibold">{studentProfile.interests.slice(0, 3).join(', ')}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => onNavigate('dashboard')}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                >
+                  Tune Profile & Interests →
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {recommendations.map((opp) => (
+                  <OpportunityCardItem
+                    key={opp.id}
+                    opp={opp}
+                    isSaved={savedIds.includes(opp.id)}
+                    matchScore={opp.score}
+                    onSelect={() => onSelectOpp(opp)}
+                    onToggleSave={() => onToggleSave(opp.id)}
+                    onApply={() => onApplyOpp(opp)}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* UPCOMING PROGRAMMES DATABASE */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Upcoming Programmes & Opportunity Database
+                </h2>
+                <p className="text-sm text-slate-600 mt-1">
+                  Explore eligibility criteria, deadlines, duration, and direct application links across all 5 categories.
+                </p>
+              </div>
+              <div className="text-xs text-slate-500 font-medium">
+                Showing <span className="font-bold text-slate-900">{filtered.length}</span> of {opportunities.length} opportunities
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm mb-8 space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by keywords, organization, skills, or tags (e.g. 'Rotary', 'Python', 'Climate', 'MUN')..."
+                  className="w-full pl-4 pr-10 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-sm transition-all focus:ring-2 focus:ring-indigo-500"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3.5 text-xs text-slate-400 hover:text-slate-600 font-semibold"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Category selector */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCat(cat)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                      selectedCat === cat
+                        ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Secondary filters */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100 text-xs">
+                <span className="font-semibold text-slate-600">Filters:</span>
+                <select
+                  value={selectedLoc}
+                  onChange={(e) => setSelectedLoc(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium"
+                >
+                  <option value="All">All Formats (Remote, Hybrid, In-Person)</option>
+                  <option value="Remote">100% Remote / Online</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="In-Person">In-Person Only</option>
+                </select>
+
+                <select
+                  value={selectedGrade}
+                  onChange={(e) => setSelectedGrade(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium"
+                >
+                  <option value="All">All High School Grades (9-12)</option>
+                  <option value="Grade 9">Grade 9</option>
+                  <option value="Grade 10">Grade 10</option>
+                  <option value="Grade 11">Grade 11</option>
+                  <option value="Grade 12">Grade 12</option>
+                </select>
+
+                <label className="inline-flex items-center gap-1.5 cursor-pointer text-slate-700 font-medium ml-auto">
+                  <input
+                    type="checkbox"
+                    checked={showUrgent}
+                    onChange={(e) => setShowUrgent(e.target.checked)}
+                    className="rounded text-indigo-600"
+                  />
+                  <span>Closing Soon (Next 14 Days)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Grid */}
+            {filtered.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map((opp) => (
+                  <OpportunityCardItem
+                    key={opp.id}
+                    opp={opp}
+                    isSaved={savedIds.includes(opp.id)}
+                    matchScore={calculateScore(opp)}
+                    onSelect={() => onSelectOpp(opp)}
+                    onToggleSave={() => onToggleSave(opp.id)}
+                    onApply={() => onApplyOpp(opp)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-md mx-auto">
+                <span className="text-4xl">🔍</span>
+                <h3 className="text-base font-bold text-slate-900 mt-3">No matching opportunities found</h3>
+                <p className="text-xs text-slate-500 mt-1 mb-4">Try clearing filters or search terms.</p>
+                <button
+                  onClick={() => {
+                    setSelectedCat('All');
+                    setSelectedLoc('All');
+                    setSelectedGrade('All');
+                    setShowUrgent(false);
+                    setSearchQuery('');
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            )}
+          </section>
+
+          {/* REDIRECT BANNER TO PAGE 2 & DASHBOARD */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+            <div className="bg-gradient-to-r from-indigo-700 via-indigo-800 to-violet-800 rounded-3xl p-8 sm:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-2 max-w-xl">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
+                  Personalized Guidance System
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-extrabold">
+                  Track Your Extracurricular Portfolio & Applications
+                </h3>
+                <p className="text-indigo-100 text-sm leading-relaxed">
+                  Log your volunteer hours, track ongoing applications, customize your weekly availability, and export a verified extracurricular portfolio for college admissions.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => onNavigate('redirect-page')}
+                  className="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-md text-center flex items-center justify-center gap-2"
+                >
+                  <span>⚡ Redirect to Student Dashboard (Page 2)</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('dashboard')}
+                  className="px-6 py-3.5 bg-white text-indigo-900 hover:bg-indigo-50 font-bold rounded-xl text-sm transition-all shadow-md text-center"
+                >
+                  Open Dashboard Directly
+                </button>
+              </div>
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    // --- REUSABLE OPPORTUNITY CARD COMPONENT ---
+    function OpportunityCardItem({ opp, isSaved, matchScore, onSelect, onToggleSave, onApply }) {
+      const getTheme = (cat) => {
+        switch (cat) {
+          case 'Volunteering':
+            return { pill: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
+          case 'Internships':
+            return { pill: 'bg-indigo-50 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' };
+          case 'Competitions':
+            return { pill: 'bg-violet-50 text-violet-700 border-violet-200', dot: 'bg-violet-500' };
+          case 'Workshops':
+            return { pill: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' };
+          case 'Certifications':
+            return { pill: 'bg-sky-50 text-sky-700 border-sky-200', dot: 'bg-sky-500' };
+          default:
+            return { pill: 'bg-slate-50 text-slate-700 border-slate-200', dot: 'bg-slate-500' };
+        }
+      };
+
+      const theme = getTheme(opp.category);
+
+      return (
+        <article className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm card-hover flex flex-col justify-between group">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${theme.pill}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${theme.dot}`}></span>
+                  {opp.category}
+                </span>
+
+                {matchScore !== undefined && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-gradient-to-r from-indigo-500 to-violet-600 text-white">
+                    ★ {matchScore}% Match
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={onToggleSave}
+                aria-label={isSaved ? 'Bookmarked' : 'Bookmark'}
+                className={`p-2 rounded-xl transition-all ${
+                  isSaved ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                ★
+              </button>
+            </div>
+
+            <h3
+              onClick={onSelect}
+              className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2 cursor-pointer leading-snug"
+            >
+              {opp.title}
+            </h3>
+
+            <div className="flex items-center gap-1.5 mt-1.5 mb-3 text-xs text-slate-600">
+              <span className="font-semibold text-slate-800">{opp.organization.name}</span>
+              {opp.organization.verified && (
+                <span className="text-blue-600 font-bold" title="Verified">✓</span>
+              )}
+            </div>
+
+            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
+              {opp.description}
+            </p>
+
+            <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100 mb-4 space-y-2 text-xs">
+              <div>
+                <span className="font-semibold text-slate-700">🎯 Eligibility: </span>
+                <span className="text-slate-600">{opp.eligibility.ageRange} ({opp.eligibility.grades})</span>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-700">⏱️ Duration: </span>
+                <span className="text-slate-600">{opp.duration} • {opp.commitment}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-700">📍 Format: </span>
+                <span className="text-slate-600">{opp.location}</span>
+              </div>
+              <div className="pt-1 border-t border-slate-200/60">
+                <span className="font-semibold text-slate-700">📅 Deadline: </span>
+                <span className="font-bold text-amber-700">{opp.deadlineFormatted}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {opp.tags.slice(0, 3).map((tag, idx) => (
+                <span key={idx} className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+            <button
+              onClick={onSelect}
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-indigo-50"
+            >
+              View Criteria →
+            </button>
+
+            <a
+              href={opp.applicationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onApply}
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs"
+            >
+              Apply Now ↗
+            </a>
+          </div>
+        </article>
+      );
+    }
+
+    // --- PAGE 2: GATEWAY REDIRECT VIEW ---
+    function RedirectPageView({ studentProfile, savedCount, applicationsCount, onRedirect }) {
+      const [seconds, setSeconds] = useState(3);
+      const [paused, setPaused] = useState(false);
+      const [triggered, setTriggered] = useState(false);
+
+      useEffect(() => {
+        if (paused || triggered) return;
+        if (seconds <= 1) {
+          setTriggered(true);
+          const t = setTimeout(() => onRedirect(), 400);
+          return () => clearTimeout(t);
+        }
+        const interval = setInterval(() => setSeconds((s) => s - 1), 1000);
+        return () => clearInterval(interval);
+      }, [seconds, paused, triggered, onRedirect]);
+
+      const progress = ((3 - seconds) / 3) * 100;
+
+      return (
+        <main id="main-content" className="min-h-[85vh] flex items-center justify-center p-4 sm:p-6 bg-slate-50">
+          <div className="max-w-xl w-full bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-700 p-6 text-white text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/20 text-xs font-semibold uppercase tracking-wider mb-2">
+                <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span>
+                Page 2 • Gateway Redirect Portal
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                Redirecting to Student Dashboard
+              </h1>
+              <p className="text-xs sm:text-sm text-indigo-100 mt-1 max-w-md mx-auto">
+                Syncing profile preferences, verified service hours, and application tracking pipeline.
+              </p>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="w-24 h-24 rounded-full border-4 border-indigo-100 flex items-center justify-center bg-indigo-50">
+                  <span className="text-4xl font-black text-indigo-600">
+                    {triggered ? '🚀' : seconds}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-slate-800 mt-3">
+                  {triggered ? 'Launching Student Dashboard...' : `Redirecting in ${seconds} second${seconds === 1 ? '' : 's'}...`}
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Destination Target: <span className="font-mono text-indigo-600">/student-dashboard/profile</span>
+                </p>
+
+                <div className="w-full bg-slate-100 rounded-full h-2.5 mt-4 overflow-hidden border border-slate-200">
+                  <div
+                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000 ease-linear"
+                    style={{ width: `${triggered ? 100 : Math.max(10, progress)}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2 text-xs">
+                <p className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                  Pre-Flight Handshake & Sync Checks:
+                </p>
+                <div className="flex justify-between text-slate-700">
+                  <span>✓ Student Identity:</span>
+                  <span className="font-semibold text-slate-900">{studentProfile.name} ({studentProfile.grade})</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>✓ Location & Availability:</span>
+                  <span className="font-semibold text-slate-900">{studentProfile.location}</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>✓ Configured Interests:</span>
+                  <span className="font-semibold text-indigo-600">{studentProfile.interests.length} Categories</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span>✓ Applications & Saved:</span>
+                  <span className="font-semibold text-slate-900">{applicationsCount} Applications • {savedCount} Saved</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setTriggered(true);
+                    onRedirect();
+                  }}
+                  className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Redirect to Student Dashboard Now →</span>
+                </button>
+
+                <div className="text-center text-xs font-semibold text-slate-600">
+                  <button onClick={() => setPaused(!paused)} className="underline hover:text-indigo-600">
+                    {paused ? '▶ Resume Auto-Redirect' : '⏸ Pause Countdown'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      );
+    }
+
+    // --- STUDENT DASHBOARD VIEW ---
+    function DashboardView({
+      studentProfile,
+      onUpdateProfile,
+      applications,
+      onUpdateAppStatus,
+      onRemoveApp,
+      opportunities,
+      savedIds,
+      onToggleSave,
+      onSelectOpp,
+      onOpenExport,
+      onNavigate,
+      calculateScore
+    }) {
+      const [activeTab, setActiveTab] = useState('profile');
+      const [isEditing, setIsEditing] = useState(false);
+      const [editForm, setEditForm] = useState({ ...studentProfile });
+      const [statusFilter, setStatusFilter] = useState('All');
+
+      // Portfolio score
+      const calcScore = () => {
+        let s = 20;
+        if (studentProfile.name && studentProfile.bio) s += 20;
+        if (studentProfile.interests.length >= 3) s += 20;
+        if (savedIds.length >= 1) s += 10;
+        if (applications.length >= 1) s += 15;
+        if (studentProfile.serviceHoursLogged >= 20) s += 15;
+        return Math.min(100, s);
+      };
+      const score = calcScore();
+
+      const toggleInterest = (tag) => {
+        setEditForm((prev) => {
+          const exists = prev.interests.includes(tag);
+          const next = exists ? prev.interests.filter((i) => i !== tag) : [...prev.interests, tag];
+          return { ...prev, interests: next };
+        });
+      };
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        onUpdateProfile(editForm);
+        setIsEditing(false);
+      };
+
+      const savedOpps = opportunities.filter((o) => savedIds.includes(o.id));
+      const filteredApps = applications.filter((a) => (statusFilter === 'All' ? true : a.status === statusFilter));
+
+      return (
+        <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <button onClick={() => onNavigate('home')} className="hover:text-indigo-600 font-medium">
+                ← Back to Explore & Recommendations
+              </button>
+              <span>/</span>
+              <span className="text-slate-800 font-semibold">Student Dashboard</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onNavigate('redirect-page')}
+                className="px-3 py-1.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold"
+              >
+                ⚡ View Page 2 Gateway
+              </button>
+              <button
+                onClick={onOpenExport}
+                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs"
+              >
+                📄 Export Extracurricular Resume
+              </button>
+            </div>
+          </div>
+
+          {/* Profile Overview Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 text-white flex items-center justify-center text-2xl font-black shadow-md shadow-indigo-100 flex-shrink-0">
+                  {studentProfile.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-2xl font-bold text-slate-900">{studentProfile.name}</h1>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                      {studentProfile.grade}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                      Age {studentProfile.age}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                    <span>📍 {studentProfile.location}</span>
+                    <span>•</span>
+                    <span>🏫 {studentProfile.school}</span>
+                    <span>•</span>
+                    <span>⏱️ {studentProfile.availability}</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="px-4 py-2 border border-slate-300 hover:border-slate-400 bg-slate-50 rounded-xl text-xs font-bold text-slate-700"
+              >
+                {isEditing ? 'Close Editor' : 'Edit Profile & Preferences'}
+              </button>
+            </div>
+
+            {/* Readiness Meter */}
+            <div className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-800">High School Portfolio Readiness Meter</span>
+                  <span className="font-extrabold text-indigo-600 text-sm">{score}% Ready</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+                  <div
+                    className="bg-gradient-to-r from-indigo-500 via-indigo-600 to-emerald-500 h-3 rounded-full transition-all duration-700"
+                    style={{ width: `${score}%` }}
+                  ></div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Calculated from profile details, registered interests, saved opportunities, and service hours.
+                </p>
+              </div>
+
+              <div className="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
+                    Rotary / Service Hours
+                  </p>
+                  <p className="text-xl font-extrabold text-emerald-950 mt-0.5">
+                    {studentProfile.serviceHoursLogged}{' '}
+                    <span className="text-xs font-normal text-emerald-700">/ {studentProfile.targetHours} Target hrs</span>
+                  </p>
+                </div>
+                <div className="text-2xl">🌱</div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-600">
+              <span className="font-bold text-slate-800">Student Bio: </span>
+              {studentProfile.bio}
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-1.5 items-center">
+              <span className="text-xs font-semibold text-slate-500 mr-1">Interests:</span>
+              {studentProfile.interests.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-medium rounded-lg text-xs border border-indigo-200/60"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* EDIT PROFILE FORM */}
+          {isEditing && (
+            <section className="bg-white rounded-3xl border-2 border-indigo-200 p-6 sm:p-8 shadow-md mb-8 animate-fadeIn">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Edit Student Profile & Preferences</h2>
+              <p className="text-xs text-slate-500 mb-4">
+                Changes will dynamically recalculate opportunity match scores across the platform.
+              </p>
+
+              <form onSubmit={handleSave} className="space-y-4 text-xs text-slate-700">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-800 mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-800 mb-1">Grade Level *</label>
+                    <select
+                      value={editForm.grade}
+                      onChange={(e) => setEditForm({ ...editForm, grade: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    >
+                      <option value="Grade 9">Grade 9</option>
+                      <option value="Grade 10">Grade 10</option>
+                      <option value="Grade 11">Grade 11</option>
+                      <option value="Grade 12">Grade 12</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-800 mb-1">Age *</label>
+                    <input
+                      type="number"
+                      min="13"
+                      max="19"
+                      required
+                      value={editForm.age}
+                      onChange={(e) => setEditForm({ ...editForm, age: parseInt(e.target.value, 10) || 16 })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-slate-800 mb-1">Location / City *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.location}
+                      onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-800 mb-1">Weekly Availability *</label>
+                    <select
+                      value={editForm.availability}
+                      onChange={(e) => setEditForm({ ...editForm, availability: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    >
+                      <option value="1 - 3 hrs/week (Flexible)">1 - 3 hrs/week (Flexible)</option>
+                      <option value="4 - 6 hrs/week (Weekends & Evenings)">4 - 6 hrs/week (Weekends & Evenings)</option>
+                      <option value="7 - 10 hrs/week (Intensive)">7 - 10 hrs/week (Intensive)</option>
+                      <option value="Weekends Only (3-4 hrs)">Weekends Only (3-4 hrs)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-800 mb-1">Student Bio</label>
+                  <textarea
+                    rows="2"
+                    value={editForm.bio}
+                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-800 mb-2">Interests & Focus Areas (Click to toggle)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {ALL_INTEREST_TAGS.map((tag) => {
+                      const sel = editForm.interests.includes(tag);
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => toggleInterest(tag)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            sel ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {sel ? '✓ ' : '+ '}
+                          {tag}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold"
+                  >
+                    Save Changes & Recalculate
+                  </button>
+                </div>
+              </form>
+            </section>
+          )}
+
+          {/* TABS */}
+          <div className="flex border-b border-slate-200 gap-6 mb-6 overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`pb-3 text-sm font-bold whitespace-nowrap transition-colors relative flex items-center gap-1.5 ${
+                activeTab === 'profile' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500'
+              }`}
+            >
+              <span>🎯 Applications Pipeline</span>
+              <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-bold">
+                {applications.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('saved')}
+              className={`pb-3 text-sm font-bold whitespace-nowrap transition-colors relative flex items-center gap-1.5 ${
+                activeTab === 'saved' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500'
+              }`}
+            >
+              <span>⭐ Bookmarked Opportunities</span>
+              <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full font-bold">
+                {savedOpps.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('recommendations')}
+              className={`pb-3 text-sm font-bold whitespace-nowrap transition-colors relative flex items-center gap-1.5 ${
+                activeTab === 'recommendations' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500'
+              }`}
+            >
+              <span>✨ Custom Recommendations Feed</span>
+            </button>
+          </div>
+
+          {/* TAB 1: Applications */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-xs text-slate-500">Track and update the status of your extracurricular initiatives.</p>
+                <div className="flex items-center gap-1 text-xs">
+                  <span className="text-slate-500 font-semibold mr-1">Status:</span>
+                  {['All', 'Accepted', 'Interviewing', 'Under Review'].map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setStatusFilter(st)}
+                      className={`px-2.5 py-1 rounded-lg font-semibold ${
+                        statusFilter === st ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filteredApps.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {filteredApps.map((app) => (
+                    <div key={app.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                            {app.category}
+                          </span>
+                          <select
+                            value={app.status}
+                            onChange={(e) => onUpdateAppStatus(app.id, e.target.value)}
+                            className="text-xs font-bold px-2 py-1 rounded-lg border bg-slate-50"
+                          >
+                            <option value="Draft">Draft</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Interviewing">Interviewing</option>
+                            <option value="Accepted">Accepted</option>
+                          </select>
+                        </div>
+                        <h3 className="text-sm font-bold text-slate-900">{app.opportunityTitle}</h3>
+                        <p className="text-xs text-slate-500 mt-1">{app.organization}</p>
+                        <div className="bg-slate-50 rounded-lg p-2.5 mt-3 text-[11px] text-slate-600 space-y-1">
+                          <p>Applied: {app.appliedDate}</p>
+                          {app.notes && <p className="italic">"{app.notes}"</p>}
+                        </div>
+                      </div>
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <button
+                          onClick={() => {
+                            const o = opportunities.find((x) => x.id === app.opportunityId);
+                            if (o) onSelectOpp(o);
+                          }}
+                          className="text-xs font-semibold text-indigo-600 hover:underline"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => onRemoveApp(app.id)}
+                          className="text-xs text-rose-600 hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 italic">No applications found under this status.</p>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: Bookmarked */}
+          {activeTab === 'saved' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {savedOpps.map((opp) => (
+                <OpportunityCardItem
+                  key={opp.id}
+                  opp={opp}
+                  isSaved={true}
+                  matchScore={calculateScore(opp)}
+                  onSelect={() => onSelectOpp(opp)}
+                  onToggleSave={() => onToggleSave(opp.id)}
+                  onApply={() => {}}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* TAB 3: Custom Feed */}
+          {activeTab === 'recommendations' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {opportunities.map((opp) => (
+                <OpportunityCardItem
+                  key={opp.id}
+                  opp={opp}
+                  isSaved={savedIds.includes(opp.id)}
+                  matchScore={calculateScore(opp)}
+                  onSelect={() => onSelectOpp(opp)}
+                  onToggleSave={() => onToggleSave(opp.id)}
+                  onApply={() => {}}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      );
+    }
+
+    // --- OPPORTUNITY DETAIL MODAL ---
+    function OpportunityModalView({ opportunity, onClose, isSaved, onToggleSave, onApplyOrTrack, isAlreadyApplied }) {
+      const [checked, setChecked] = useState({});
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-start justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                  {opportunity.category}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">{opportunity.title}</h2>
+                <p className="text-xs text-slate-600 mt-1 font-semibold">{opportunity.organization.name}</p>
+              </div>
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700">✕</button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-6 text-xs text-slate-700">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div>
+                  <p className="text-slate-500 font-medium">Age & Grade</p>
+                  <p className="font-bold text-slate-900">{opportunity.eligibility.ageRange}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 font-medium">Duration</p>
+                  <p className="font-bold text-slate-900">{opportunity.duration}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 font-medium">Location</p>
+                  <p className="font-bold text-slate-900">{opportunity.locationType}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 font-medium">Deadline</p>
+                  <p className="font-bold text-amber-700">{opportunity.deadlineFormatted}</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900 uppercase tracking-wider mb-1.5">Overview</h3>
+                <p className="leading-relaxed">{opportunity.longDescription || opportunity.description}</p>
+              </div>
+
+              <div className="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100">
+                <h3 className="font-bold text-indigo-950 mb-2">📋 Eligibility Criteria & Self-Check</h3>
+                <div className="space-y-2">
+                  {opportunity.eligibility.prerequisites.map((req, idx) => (
+                    <label key={idx} className="flex items-start gap-2.5 cursor-pointer bg-white p-2.5 rounded-lg border border-indigo-100">
+                      <input
+                        type="checkbox"
+                        checked={!!checked[idx]}
+                        onChange={() => setChecked({ ...checked, [idx]: !checked[idx] })}
+                        className="mt-0.5 rounded text-indigo-600"
+                      />
+                      <span className={checked[idx] ? 'line-through text-slate-400' : ''}>{req}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-900 uppercase tracking-wider mb-2">Verified Perks & Hours</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {opportunity.perks.map((perk, idx) => (
+                    <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 font-medium">
+                      🏆 {perk}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 sm:p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+              <button
+                onClick={() => onToggleSave(opportunity.id)}
+                className="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold"
+              >
+                {isSaved ? '★ Bookmarked' : '☆ Save to Dashboard'}
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onApplyOrTrack(opportunity)}
+                  className="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold"
+                >
+                  {isAlreadyApplied ? '✓ Tracked' : '+ Track Application'}
+                </button>
+                <a
+                  href={opportunity.applicationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => onApplyOrTrack(opportunity)}
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-200"
+                >
+                  Official Application Portal ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // --- ADVERTISE MODAL ---
+    function AdvertiseModalView({ onClose, onAddOpportunity }) {
+      const [title, setTitle] = useState('');
+      const [orgName, setOrgName] = useState('');
+      const [category, setCategory] = useState('Volunteering');
+      const [description, setDescription] = useState('');
+      const [url, setUrl] = useState('');
+
+      const submit = (e) => {
+        e.preventDefault();
+        onAddOpportunity({
+          id: `custom-${Date.now()}`,
+          title,
+          organization: { name: orgName, verified: true, type: 'Community Organization' },
+          category,
+          description,
+          longDescription: description,
+          eligibility: {
+            ageRange: '14 - 18 years',
+            grades: 'Grades 9 - 12',
+            locationRequirement: 'Remote / Hybrid',
+            prerequisites: ['Passionate student', 'Weekly attendance']
+          },
+          deadline: '2026-12-31',
+          deadlineFormatted: 'Dec 31, 2026',
+          deadlineType: 'Upcoming',
+          duration: '6 Weeks',
+          commitment: '3 hrs/week',
+          location: 'Remote / Virtual',
+          locationType: 'Remote',
+          cost: 'Free',
+          perks: ['Verified Certificate', 'Service Hours'],
+          tags: [category, 'Youth Outreach'],
+          applicationUrl: url || 'https://example.org'
+        });
+        onClose();
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-slate-900">Advertise Your Program</h2>
+              <button onClick={onClose} className="text-slate-400 hover:text-slate-700">✕</button>
+            </div>
+            <form onSubmit={submit} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold mb-1">Organization Name *</label>
+                <input required value={orgName} onChange={(e) => setOrgName(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="e.g. Rotary Club" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Program Title *</label>
+                <input required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="e.g. Youth Leadership Fellowship" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Category *</label>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg">
+                  <option value="Volunteering">Volunteering</option>
+                  <option value="Internships">Internships</option>
+                  <option value="Competitions">Competitions</option>
+                  <option value="Workshops">Workshops</option>
+                  <option value="Certifications">Certifications</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Description *</label>
+                <textarea required rows="3" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Application URL *</label>
+                <input required type="url" value={url} onChange={(e) => setUrl(e.target.value)} className="w-full px-3 py-2 border rounded-lg" placeholder="https://..." />
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <button type="button" onClick={onClose} className="px-4 py-2 border rounded-lg">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-indigo-600 text-white rounded-lg font-bold">Publish Program</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // --- PORTFOLIO EXPORT MODAL ---
+    function PortfolioExportModalView({ onClose, studentProfile, applications, opportunities }) {
+      const handlePrint = () => window.print();
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-slate-900">Extracurricular Portfolio Summary</h2>
+              <button onClick={onClose} className="text-slate-400 hover:text-slate-700">✕</button>
+            </div>
+
+            <div id="printable-resume" className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-3">
+              <div className="border-b pb-3">
+                <h3 className="text-base font-bold text-slate-900">{studentProfile.name}</h3>
+                <p className="text-slate-600">{studentProfile.grade} • {studentProfile.school} • {studentProfile.location}</p>
+                <p className="font-bold text-emerald-700 mt-1">{studentProfile.serviceHoursLogged} Verified Service Hours Logged</p>
+              </div>
+              <div>
+                <p className="font-bold text-slate-800">Interests:</p>
+                <p className="text-slate-600">{studentProfile.interests.join(', ')}</p>
+              </div>
+              <div>
+                <p className="font-bold text-slate-800">Extracurricular Applications & Initiatives:</p>
+                <div className="space-y-1.5 mt-1">
+                  {applications.map((a, i) => (
+                    <div key={i} className="p-2 bg-white rounded border border-slate-200">
+                      <p className="font-bold text-slate-900">{a.opportunityTitle} ({a.status})</p>
+                      <p className="text-slate-500">{a.organization} • {a.category}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <button onClick={onClose} className="px-4 py-2 border rounded-lg text-xs font-semibold">Close</button>
+              <button onClick={handlePrint} className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold">
+                🖨️ Print / Save as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // MOUNT TO DOM
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
